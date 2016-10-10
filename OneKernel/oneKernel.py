@@ -43,7 +43,8 @@ def loadDataFile(filename):
 
 if __name__=='__main__':
     X, Xtest, Y, Ytest = loadDataFile("kddcup.data_cv")
-    clf = svm.OneClassSVM(nu=0.5, kernel="poly", degree=3, gamma=0.1)
+    # Tune these arguments for tweaking the result
+    clf = svm.OneClassSVM(nu=0.5, kernel="poly", degree=2, gamma=0.1)
     clf.fit(X)
     y_pred_train = clf.predict(X)
     y_pred_test = clf.predict(Xtest)
