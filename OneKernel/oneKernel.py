@@ -5,6 +5,14 @@ from sklearn.cross_validation import train_test_split
 import numpy as np
 from sklearn import svm
 
+#
+# Learning set created using the normal rows like so:
+#       head -n 200000 kdd_cup.data_corrected | grep 'normal.' > kddcup.data_cv
+# Random test set created as:
+#       shuf -n 100000 kdd_cup.data_corrected > kddcup.data_test
+#
+
+
 def loadDataFile(filename):
     col_names = ["duration","protocol_type","service","flag","src_bytes",
         "dst_bytes","land","wrong_fragment","urgent","hot","num_failed_logins",
