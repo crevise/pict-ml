@@ -4,12 +4,13 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.cross_validation import train_test_split
 import numpy as np
 from sklearn import svm
+from sklearn.covariance import EllipticEnvelope
 
 #
 # Learning set created using the normal rows like so:
-#       head -n 200000 kdd_cup.data_corrected | grep 'normal.' > kddcup.data_cv
+#       head -n 100000 kddcup.data.corrected | grep 'normal.' > kddcup.data_cv
 # Random test set created as:
-#       shuf -n 100000 kdd_cup.data_corrected > kddcup.data_test
+#       shuf -n 100000 kddcup.data.corrected > kddcup.data_test
 #
 
 
@@ -52,10 +53,10 @@ def loadDataFile(filename):
 if __name__=='__main__':
     X, Xtest, Y, Ytest = loadDataFile("kddcup.data_cv")
     # Tune these arguments for tweaking the result
-    clf = svm.OneClassSVM(nu=0.5, kernel="poly", degree=2, gamma=0.1)
-    clf.fit(X)
-    y_pred_train = clf.predict(X)
-    y_pred_test = clf.predict(Xtest)
+    clfsvm = svm.OneClassSVM(nu=0.01, kernel="poly", degree=2, gamma=0.1)
+    clfsvm.fit(X)
+    y_pred_train = clfsvm.predict(X)
+    y_pred_test = clfsvm.predict(Xtest)
     correct = 0
     wrong = 0
 
@@ -72,7 +73,8 @@ if __name__=='__main__':
     false_positive = 0
     true_negative = 0
     X, Xtest, Y, Ytest = loadDataFile("kddcup.data_test")
-    y_pred_train = clf.predict(X)
+    y_pred_train = clfsvm.predict(X)
+
     for (i,), value in np.ndenumerate(Y):
         if y_pred_train[i] == 1.0 and value == 'normal.':
             correct += 1
@@ -83,5 +85,17 @@ if __name__=='__main__':
         else:
             true_negative += 1
     print 'Test set correct:', correct, 'false postive: ', false_positive, 'true negative: ', true_negative
-    
 
+
+    # clfcovar = EllipticEnvelope(contamination=0.1)
+    # clfcovar.fit(X)
+    # for (i,), value in np.ndenumerate(Y):
+    #     if y_pred_train[i] < 0.8 and value == 'normal.':
+    #         correct += 1
+    #     elif y_pred_train[i] > 0.8 and value == 'attack.':
+    #         correct += 1
+    #     elif y_pred_train[i] > 0.8 -1.0 and value == 'normal.':
+    #         false_positive += 1
+    #     else:
+    #         true_negative += 1
+    # print 'Test set correct:', correct, 'false postive: ', false_positive, 'true negative: ', true_negative
